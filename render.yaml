@@ -1,0 +1,30 @@
+services:
+  # Gemini-Balance 应用服务
+  - type: web
+    name: gemini-balance
+    runtime: image
+    image:
+      url: sofs2005/gemini-balance:latest # 使用官方提供的 Docker 镜像
+    plan: free # 你可以根据需求选择付费计划
+    healthCheckPath: /
+    envVars:
+      - key: DATABASE_URL
+        fromService:
+          type: pserv
+          name: gemini-db
+          property: connectionString
+      - key: AUTH_KEY
+        generateValue: true # 自动生成一个随机的 AUTH_KEY
+      - key: PORT # 指定应用监听的端口
+        value: 8000
+      - key: TZ # 设置时区
+        value: Asia/Shanghai
+
+  # PostgreSQL 数据库服务
+  - type: pserv
+    name: gemini-db
+    engine: postgres
+    plan: free # 你可以根据需求选择付费计划
+    dbName: gemini_balance
+    user: gemini_user
+    ipAllowList: [] # 允许所有 IP 连接 (仅限 Render 内部网络)
